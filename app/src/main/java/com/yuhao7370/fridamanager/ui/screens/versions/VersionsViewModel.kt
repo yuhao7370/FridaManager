@@ -3,6 +3,7 @@ package com.yuhao7370.fridamanager.ui.screens.versions
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yuhao7370.fridamanager.BuildConfig
 import com.yuhao7370.fridamanager.R
 import com.yuhao7370.fridamanager.domain.CancelFridaDownloadUseCase
 import com.yuhao7370.fridamanager.domain.ClearFinishedDownloadsUseCase
@@ -10,6 +11,7 @@ import com.yuhao7370.fridamanager.domain.DeleteFridaVersionUseCase
 import com.yuhao7370.fridamanager.domain.DetectDeviceAbiUseCase
 import com.yuhao7370.fridamanager.domain.EnqueueFridaDownloadUseCase
 import com.yuhao7370.fridamanager.domain.FetchRemoteFridaVersionsUseCase
+import com.yuhao7370.fridamanager.domain.FetchRemoteFridaVersionByTagUseCase
 import com.yuhao7370.fridamanager.domain.GetCachedRemoteFridaVersionsUseCase
 import com.yuhao7370.fridamanager.domain.GetInstalledFridaVersionsUseCase
 import com.yuhao7370.fridamanager.domain.ImportFridaVersionUseCase
@@ -39,6 +41,7 @@ data class VersionsUiState(
     val downloads: List<DownloadTask> = emptyList(),
     val quickVersionInput: String = "",
     val loadingRemote: Boolean = false,
+    val loadingRemoteDebugMessage: String? = null,
     val installProgress: InstallProgress? = null,
     val busyVersion: String? = null,
     val messageRes: Int? = null,
@@ -52,6 +55,7 @@ class VersionsViewModel(
     private val getCachedRemoteFridaVersions: GetCachedRemoteFridaVersionsUseCase,
     observeDownloadTasks: ObserveDownloadTasksUseCase,
     private val fetchRemoteFridaVersions: FetchRemoteFridaVersionsUseCase,
+    private val fetchRemoteFridaVersionByTag: FetchRemoteFridaVersionByTagUseCase,
     private val enqueueFridaDownload: EnqueueFridaDownloadUseCase,
     private val cancelFridaDownload: CancelFridaDownloadUseCase,
     private val retryFridaDownload: RetryFridaDownloadUseCase,
@@ -93,11 +97,31 @@ class VersionsViewModel(
 
     fun refreshRemote() {
         viewModelScope.launch {
-            _uiState.update { it.copy(loadingRemote = true, messageRes = null, message = null) }
-            when (val result = fetchRemoteFridaVersions(uiState.value.settings.githubApiBaseUrl)) {
+            _uiState.update {
+                it.copy(
+                    loadingRemote = true,
+                    loadingRemoteDebugMessage = if (BuildConfig.DEBUG) "Starting remote refresh..." else null,
+                    messageRes = null,
+                    message = null
+                )
+            }
+            when (
+                val result = fetchRemoteFridaVersions(
+                    uiState.value.settings.githubApiBaseUrl
+                ) { progress ->
+                    if (BuildConfig.DEBUG) {
+                        _uiState.update {
+                            it.copy(
+                                loadingRemoteDebugMessage = "${progress.message} | pages ${progress.loadedPages}/${progress.totalPages} | releases ${progress.loadedReleases}"
+                            )
+                        }
+                    }
+                }
+            ) {
                 is AppResult.Success -> _uiState.update {
                     it.copy(
                         loadingRemote = false,
+                        loadingRemoteDebugMessage = null,
                         remote = result.data,
                         messageRes = null,
                         message = null
@@ -111,6 +135,7 @@ class VersionsViewModel(
                         errorMessage.contains("gateway timeout", ignoreCase = true)
                     it.copy(
                         loadingRemote = false,
+                        loadingRemoteDebugMessage = null,
                         messageRes = if (isTimeout) R.string.versions_remote_timeout_hint else null,
                         message = if (isTimeout) null else errorMessage
                     )
@@ -135,8 +160,41 @@ class VersionsViewModel(
             download(currentMatch)
             return
         }
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    loadingRemote = true,
+                    loadingRemoteDebugMessage = if (BuildConfig.DEBUG) "Resolving exact release tag..." else null,
+                    messageRes = null,
+                    message = null
+                )
+            }
+            when (val result = fetchRemoteFridaVersionByTag(uiState.value.settings.githubApiBaseUrl, targetVersion)) {
+                is AppResult.Success -> {
+                    download(result.data)
+                    _uiState.update {
+                        it.copy(
+                            loadingRemote = false,
+                            loadingRemoteDebugMessage = null,
+                            remote = listOf(result.data) + it.remote.filterNot { remoteVersion ->
+                                normalizeVersion(remoteVersion.version).equals(targetVersion, ignoreCase = true)
+                            },
+                            messageRes = null,
+                            message = null
+                        )
+                    }
+                }
 
-        _uiState.update { it.copy(messageRes = R.string.versions_quick_not_found, message = null) }
+                is AppResult.Failure -> _uiState.update {
+                    it.copy(
+                        loadingRemote = false,
+                        loadingRemoteDebugMessage = null,
+                        messageRes = R.string.versions_quick_not_found,
+                        message = null
+                    )
+                }
+            }
+        }
     }
 
     fun download(version: RemoteFridaVersion) {
@@ -268,7 +326,8 @@ class VersionsViewModel(
         _uiState.update {
             it.copy(
                 remote = cached,
-                loadingRemote = false
+                loadingRemote = false,
+                loadingRemoteDebugMessage = null
             )
         }
     }

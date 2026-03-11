@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.yuhao7370.fridamanager.BuildConfig
 import com.yuhao7370.fridamanager.R
 import com.yuhao7370.fridamanager.model.DownloadTask
 import com.yuhao7370.fridamanager.model.DownloadTaskStatus
@@ -273,7 +274,13 @@ fun VersionsScreen(viewModel: VersionsViewModel) {
                     if (uiState.loadingRemote) {
                         item {
                             MiCard {
-                                MiLoadingState(label = stringResource(R.string.versions_loading_remote))
+                                MiLoadingState(
+                                    label = if (BuildConfig.DEBUG) {
+                                        uiState.loadingRemoteDebugMessage ?: stringResource(R.string.versions_loading_remote)
+                                    } else {
+                                        stringResource(R.string.versions_loading_remote)
+                                    }
+                                )
                             }
                         }
                     } else if (remoteGroups.isEmpty()) {

@@ -13,6 +13,8 @@ import com.yuhao7370.fridamanager.data.local.RuntimeStateStore
 import com.yuhao7370.fridamanager.data.local.VersionBackupStore
 import com.yuhao7370.fridamanager.data.local.toModel
 import com.yuhao7370.fridamanager.data.remote.FridaReleaseMapper
+import com.yuhao7370.fridamanager.data.remote.GitHubReleaseFetchResult
+import com.yuhao7370.fridamanager.data.remote.GitHubReleaseFetchProgress
 import com.yuhao7370.fridamanager.data.remote.GitHubReleaseApi
 import com.yuhao7370.fridamanager.data.remote.awaitResponse
 import com.yuhao7370.fridamanager.model.AppResult
@@ -64,14 +66,65 @@ class FridaVersionRepository(
         }
     }
 
-    suspend fun fetchRemoteVersions(apiBaseUrl: String): AppResult<List<RemoteFridaVersion>> {
+    suspend fun fetchRemoteVersions(
+        apiBaseUrl: String,
+        onProgress: (GitHubReleaseFetchProgress) -> Unit = {}
+    ): AppResult<List<RemoteFridaVersion>> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                val releases = gitHubReleaseApi.fetchFridaReleases(apiBaseUrl)
-                val mapped = FridaReleaseMapper.mapToRemoteVersions(releases)
-                if (mapped.isNotEmpty()) {
-                    remoteReleaseCacheStore.save(apiBaseUrl, mapped)
+                val cachedSnapshot = remoteReleaseCacheStore.loadExactSnapshot(apiBaseUrl)
+                when (
+                    val fetchResult = gitHubReleaseApi.fetchFridaReleases(
+                        baseUrl = apiBaseUrl,
+                        cachedEtag = cachedSnapshot?.etag,
+                        knownVersions = cachedSnapshot?.versions.orEmpty().map { it.version }.toSet(),
+                        onProgress = onProgress
+                    )
+                ) {
+                    GitHubReleaseFetchResult.NotModified -> {
+                        AppResult.Success(cachedSnapshot?.versions.orEmpty(), fromCache = true)
+                    }
+
+                    is GitHubReleaseFetchResult.Updated -> {
+                        val fetched = FridaReleaseMapper.mapToRemoteVersions(fetchResult.releases)
+                        val merged = mergeRemoteVersions(
+                            fresh = fetched,
+                            cached = cachedSnapshot?.versions.orEmpty()
+                        )
+                        if (merged.isNotEmpty()) {
+                            remoteReleaseCacheStore.save(apiBaseUrl, merged, fetchResult.etag)
+                        }
+                        AppResult.Success(merged)
+                    }
                 }
+            }.getOrElse { throwable ->
+                AppResult.Failure(
+                    RuntimeError(
+                        type = RuntimeErrorType.GITHUB_REQUEST_FAILURE,
+                        message = throwable.message
+                    )
+                )
+            }
+        }
+    }
+
+    suspend fun fetchRemoteVersionByTag(apiBaseUrl: String, version: String): AppResult<RemoteFridaVersion> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                val release = gitHubReleaseApi.fetchReleaseByTag(apiBaseUrl, version)
+                    ?: return@runCatching AppResult.Failure(
+                        RuntimeError(
+                            type = RuntimeErrorType.GITHUB_REQUEST_FAILURE,
+                            message = "Version not found in remote releases"
+                        )
+                    )
+                val mapped = FridaReleaseMapper.mapToRemoteVersions(listOf(release)).firstOrNull()
+                    ?: return@runCatching AppResult.Failure(
+                        RuntimeError(
+                            type = RuntimeErrorType.INVALID_ASSET,
+                            message = "No supported frida-server asset in release ${release.tagName}"
+                        )
+                    )
                 AppResult.Success(mapped)
             }.getOrElse { throwable ->
                 AppResult.Failure(
@@ -328,6 +381,17 @@ class FridaVersionRepository(
         }
         logger.log("Installed version=$version source=$source path=${targetBinary.absolutePath}")
         return (dao.getByVersion(version) ?: entity).toModel(isValid = true)
+    }
+
+    private fun mergeRemoteVersions(
+        fresh: List<RemoteFridaVersion>,
+        cached: List<RemoteFridaVersion>
+    ): List<RemoteFridaVersion> {
+        if (cached.isEmpty()) return fresh
+        val merged = LinkedHashMap<String, RemoteFridaVersion>()
+        fresh.forEach { merged[it.version] = it }
+        cached.forEach { version -> merged.putIfAbsent(version.version, version) }
+        return merged.values.toList()
     }
 
     private suspend fun downloadAsset(

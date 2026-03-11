@@ -23,6 +23,7 @@ import com.yuhao7370.fridamanager.domain.DeleteFridaVersionUseCase
 import com.yuhao7370.fridamanager.domain.DetectDeviceAbiUseCase
 import com.yuhao7370.fridamanager.domain.EnqueueFridaDownloadUseCase
 import com.yuhao7370.fridamanager.domain.FetchRemoteFridaVersionsUseCase
+import com.yuhao7370.fridamanager.domain.FetchRemoteFridaVersionByTagUseCase
 import com.yuhao7370.fridamanager.domain.GetCachedRemoteFridaVersionsUseCase
 import com.yuhao7370.fridamanager.domain.GetInstalledFridaVersionsUseCase
 import com.yuhao7370.fridamanager.domain.ImportFridaVersionUseCase
@@ -124,6 +125,7 @@ class AppContainer(private val context: Context) {
 
     val detectDeviceAbiUseCase = DetectDeviceAbiUseCase(abiRepository)
     val fetchRemoteFridaVersionsUseCase = FetchRemoteFridaVersionsUseCase(versionRepository)
+    val fetchRemoteFridaVersionByTagUseCase = FetchRemoteFridaVersionByTagUseCase(versionRepository)
     val getCachedRemoteFridaVersionsUseCase = GetCachedRemoteFridaVersionsUseCase(versionRepository)
     val getInstalledFridaVersionsUseCase = GetInstalledFridaVersionsUseCase(versionRepository)
     val observeDownloadTasksUseCase = ObserveDownloadTasksUseCase(downloadManager)

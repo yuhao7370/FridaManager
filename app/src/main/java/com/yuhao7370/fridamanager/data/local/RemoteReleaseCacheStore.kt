@@ -14,7 +14,15 @@ class RemoteReleaseCacheStore(
         encodeDefaults = true
     }
 ) {
-    suspend fun save(baseUrl: String, versions: List<RemoteFridaVersion>) = withContext(Dispatchers.IO) {
+    data class Snapshot(
+        val baseUrl: String,
+        val savedAtMs: Long,
+        val versions: List<RemoteFridaVersion>,
+        val etag: String?
+    )
+
+    suspend fun save(baseUrl: String, versions: List<RemoteFridaVersion>, etag: String? = null) =
+        withContext(Dispatchers.IO) {
         if (versions.isEmpty()) return@withContext
         val payload = readPayload()
         val normalizedBaseUrl = normalizeBaseUrl(baseUrl)
@@ -24,7 +32,8 @@ class RemoteReleaseCacheStore(
                 RemoteReleaseCacheEntry(
                     baseUrl = normalizedBaseUrl,
                     savedAtMs = System.currentTimeMillis(),
-                    versions = versions
+                    versions = versions,
+                    etag = etag
                 )
             )
             .sortedByDescending { it.savedAtMs }
@@ -34,6 +43,18 @@ class RemoteReleaseCacheStore(
     }
 
     suspend fun load(baseUrl: String): List<RemoteFridaVersion>? = withContext(Dispatchers.IO) {
+        loadSnapshot(baseUrl)?.versions
+    }
+
+    suspend fun loadExactSnapshot(baseUrl: String): Snapshot? = withContext(Dispatchers.IO) {
+        val payload = readPayload()
+        val normalizedBaseUrl = normalizeBaseUrl(baseUrl)
+        payload.entries
+            .firstOrNull { normalizeBaseUrl(it.baseUrl) == normalizedBaseUrl && it.versions.isNotEmpty() }
+            ?.toSnapshot()
+    }
+
+    suspend fun loadSnapshot(baseUrl: String): Snapshot? = withContext(Dispatchers.IO) {
         val payload = readPayload()
         if (payload.entries.isEmpty()) return@withContext null
 
@@ -41,9 +62,9 @@ class RemoteReleaseCacheStore(
         val exact = payload.entries.firstOrNull {
             normalizeBaseUrl(it.baseUrl) == normalizedBaseUrl && it.versions.isNotEmpty()
         }
-        if (exact != null) return@withContext exact.versions
+        if (exact != null) return@withContext exact.toSnapshot()
 
-        payload.entries.firstOrNull { it.versions.isNotEmpty() }?.versions
+        payload.entries.firstOrNull { it.versions.isNotEmpty() }?.toSnapshot()
     }
 
     private fun readPayload(): RemoteReleaseCachePayload {
@@ -78,8 +99,18 @@ class RemoteReleaseCacheStore(
     private data class RemoteReleaseCacheEntry(
         val baseUrl: String,
         val savedAtMs: Long,
-        val versions: List<RemoteFridaVersion>
+        val versions: List<RemoteFridaVersion>,
+        val etag: String? = null
     )
+
+    private fun RemoteReleaseCacheEntry.toSnapshot(): Snapshot {
+        return Snapshot(
+            baseUrl = baseUrl,
+            savedAtMs = savedAtMs,
+            versions = versions,
+            etag = etag
+        )
+    }
 
     private companion object {
         const val MAX_ENTRIES = 6

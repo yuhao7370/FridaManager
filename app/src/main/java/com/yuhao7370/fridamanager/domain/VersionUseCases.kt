@@ -3,6 +3,7 @@ package com.yuhao7370.fridamanager.domain
 import android.net.Uri
 import com.yuhao7370.fridamanager.data.FridaRuntimeRepository
 import com.yuhao7370.fridamanager.data.FridaVersionRepository
+import com.yuhao7370.fridamanager.data.remote.GitHubReleaseFetchProgress
 import com.yuhao7370.fridamanager.model.AppResult
 import com.yuhao7370.fridamanager.model.InstallProgress
 import com.yuhao7370.fridamanager.model.InstalledFridaVersion
@@ -10,8 +11,16 @@ import com.yuhao7370.fridamanager.model.RemoteFridaVersion
 import kotlinx.coroutines.flow.Flow
 
 class FetchRemoteFridaVersionsUseCase(private val repository: FridaVersionRepository) {
-    suspend operator fun invoke(apiBaseUrl: String): AppResult<List<RemoteFridaVersion>> =
-        repository.fetchRemoteVersions(apiBaseUrl)
+    suspend operator fun invoke(
+        apiBaseUrl: String,
+        onProgress: (GitHubReleaseFetchProgress) -> Unit = {}
+    ): AppResult<List<RemoteFridaVersion>> =
+        repository.fetchRemoteVersions(apiBaseUrl, onProgress)
+}
+
+class FetchRemoteFridaVersionByTagUseCase(private val repository: FridaVersionRepository) {
+    suspend operator fun invoke(apiBaseUrl: String, version: String): AppResult<RemoteFridaVersion> =
+        repository.fetchRemoteVersionByTag(apiBaseUrl, version)
 }
 
 class GetCachedRemoteFridaVersionsUseCase(private val repository: FridaVersionRepository) {

@@ -30,6 +30,7 @@ class FridaViewModelFactory(
                 getInstalledFridaVersions = container.getInstalledFridaVersionsUseCase,
                 getCachedRemoteFridaVersions = container.getCachedRemoteFridaVersionsUseCase,
                 fetchRemoteFridaVersions = container.fetchRemoteFridaVersionsUseCase,
+                fetchRemoteFridaVersionByTag = container.fetchRemoteFridaVersionByTagUseCase,
                 observeDownloadTasks = container.observeDownloadTasksUseCase,
                 enqueueFridaDownload = container.enqueueFridaDownloadUseCase,
                 cancelFridaDownload = container.cancelFridaDownloadUseCase,
