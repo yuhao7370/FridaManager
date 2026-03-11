@@ -2,7 +2,6 @@ package com.yuhao7370.fridamanager.ui
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.LocaleList
 import android.text.TextUtils
 import androidx.compose.runtime.Composable
@@ -23,12 +22,7 @@ fun ProvideLocalizedResources(
     val baseContext = LocalContext.current
     val systemConfiguration = LocalConfiguration.current
     val systemLanguageTags = remember(systemConfiguration) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            systemConfiguration.locales.toLanguageTags()
-        } else {
-            @Suppress("DEPRECATION")
-            systemConfiguration.locale?.toLanguageTag().orEmpty()
-        }
+        systemConfiguration.locales.toLanguageTags()
     }
     val localizedContext = remember(baseContext, languagePreference, systemLanguageTags) {
         when (languagePreference) {
@@ -41,12 +35,7 @@ fun ProvideLocalizedResources(
         Configuration(localizedContext.resources.configuration)
     }
     val layoutDirection = remember(localizedConfiguration) {
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            localizedConfiguration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            localizedConfiguration.locale
-        } ?: Locale.getDefault()
+        val locale = localizedConfiguration.locales[0] ?: Locale.getDefault()
         if (TextUtils.getLayoutDirectionFromLocale(locale) == android.view.View.LAYOUT_DIRECTION_RTL) {
             LayoutDirection.Rtl
         } else {
@@ -64,12 +53,7 @@ fun ProvideLocalizedResources(
 
 private fun Context.withAppLocale(locale: Locale): Context {
     val configuration = Configuration(resources.configuration)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        configuration.setLocales(LocaleList(locale))
-    } else {
-        @Suppress("DEPRECATION")
-        configuration.locale = locale
-    }
+    configuration.setLocales(LocaleList(locale))
     configuration.setLayoutDirection(locale)
     return createConfigurationContext(configuration)
 }
