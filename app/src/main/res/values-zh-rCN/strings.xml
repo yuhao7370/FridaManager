@@ -139,8 +139,6 @@
     <string name="settings_top_subtitle">运行默认值与应用偏好</string>
     <string name="settings_runtime_defaults">运行默认值</string>
     <string name="settings_runtime_subtitle">启动 frida-server 时使用的主机与端口</string>
-    <string name="settings_autostart">开机自动启动</string>
-    <string name="settings_autostart_subtitle">仅尽力启动，实际行为受 ROM 和 root 环境影响。</string>
     <string name="settings_default_host">默认主机</string>
     <string name="settings_default_port">默认端口</string>
     <string name="settings_logs_network">日志与网络</string>

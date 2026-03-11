@@ -3,7 +3,6 @@ package com.yuhao7370.fridamanager.data.settings
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -18,7 +17,6 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 
 class AppSettingsStore(private val context: Context) {
     private object Keys {
-        val autoStart = booleanPreferencesKey("auto_start")
         val defaultHost = stringPreferencesKey("default_host")
         val defaultPort = intPreferencesKey("default_port")
         val logRetentionKb = intPreferencesKey("log_retention_kb")
@@ -29,7 +27,6 @@ class AppSettingsStore(private val context: Context) {
 
     val settingsFlow: Flow<AppSettings> = context.dataStore.data.map { prefs ->
         AppSettings(
-            autoStart = prefs[Keys.autoStart] ?: false,
             defaultHost = prefs[Keys.defaultHost] ?: "127.0.0.1",
             defaultPort = prefs[Keys.defaultPort] ?: 27042,
             logRetentionKb = prefs[Keys.logRetentionKb] ?: 2048,
@@ -49,7 +46,6 @@ class AppSettingsStore(private val context: Context) {
 
     suspend fun update(settings: AppSettings) {
         context.dataStore.edit { prefs ->
-            prefs[Keys.autoStart] = settings.autoStart
             prefs[Keys.defaultHost] = settings.defaultHost
             prefs[Keys.defaultPort] = settings.defaultPort
             prefs[Keys.logRetentionKb] = settings.logRetentionKb

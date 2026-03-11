@@ -37,8 +37,6 @@ class SettingsViewModel(
         }
     }
 
-    fun updateAutoStart(enabled: Boolean) = save { it.copy(autoStart = enabled) }
-
     fun updateHost(host: String) = save { it.copy(defaultHost = host.ifBlank { "127.0.0.1" }) }
 
     fun updatePort(portText: String) {

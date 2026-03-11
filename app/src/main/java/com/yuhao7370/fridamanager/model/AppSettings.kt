@@ -13,7 +13,6 @@ enum class LanguagePreference {
 }
 
 data class AppSettings(
-    val autoStart: Boolean = false,
     val defaultHost: String = "127.0.0.1",
     val defaultPort: Int = 27042,
     val logRetentionKb: Int = 2048,

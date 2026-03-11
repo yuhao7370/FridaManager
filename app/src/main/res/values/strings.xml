@@ -139,8 +139,6 @@
     <string name="settings_top_subtitle">Runtime defaults and app preferences</string>
     <string name="settings_runtime_defaults">Runtime defaults</string>
     <string name="settings_runtime_subtitle">Host and port used when starting frida-server</string>
-    <string name="settings_autostart">Auto-start on boot</string>
-    <string name="settings_autostart_subtitle">Best effort only, ROM/root behavior varies.</string>
     <string name="settings_default_host">Default host</string>
     <string name="settings_default_port">Default port</string>
     <string name="settings_logs_network">Logs and network</string>
