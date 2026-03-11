@@ -23,10 +23,6 @@ class RefreshRuntimeStatusUseCase(private val repository: FridaRuntimeRepository
     suspend operator fun invoke() = repository.refreshStatus()
 }
 
-class RecoverRuntimeStatusUseCase(private val repository: FridaRuntimeRepository) {
-    suspend operator fun invoke() = repository.recoverStatus()
-}
-
 class SetRuntimeMonitoringUseCase(private val repository: FridaRuntimeRepository) {
     operator fun invoke(enabled: Boolean) = repository.setStatusMonitoringEnabled(enabled)
 }

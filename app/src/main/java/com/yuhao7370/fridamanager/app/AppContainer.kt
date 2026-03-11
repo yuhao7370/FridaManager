@@ -21,7 +21,6 @@ import com.yuhao7370.fridamanager.domain.ClearFinishedDownloadsUseCase
 import com.yuhao7370.fridamanager.domain.CancelFridaDownloadUseCase
 import com.yuhao7370.fridamanager.domain.DeleteFridaVersionUseCase
 import com.yuhao7370.fridamanager.domain.DetectDeviceAbiUseCase
-import com.yuhao7370.fridamanager.domain.DownloadFridaVersionUseCase
 import com.yuhao7370.fridamanager.domain.EnqueueFridaDownloadUseCase
 import com.yuhao7370.fridamanager.domain.FetchRemoteFridaVersionsUseCase
 import com.yuhao7370.fridamanager.domain.GetCachedRemoteFridaVersionsUseCase
@@ -30,7 +29,6 @@ import com.yuhao7370.fridamanager.domain.ImportFridaVersionUseCase
 import com.yuhao7370.fridamanager.domain.ObserveRuntimeStatusUseCase
 import com.yuhao7370.fridamanager.domain.ObserveSettingsUseCase
 import com.yuhao7370.fridamanager.domain.ObserveDownloadTasksUseCase
-import com.yuhao7370.fridamanager.domain.RecoverRuntimeStatusUseCase
 import com.yuhao7370.fridamanager.domain.ReadLogsUseCase
 import com.yuhao7370.fridamanager.domain.RefreshRuntimeStatusUseCase
 import com.yuhao7370.fridamanager.domain.RestartFridaServerUseCase
@@ -128,7 +126,6 @@ class AppContainer(private val context: Context) {
     val fetchRemoteFridaVersionsUseCase = FetchRemoteFridaVersionsUseCase(versionRepository)
     val getCachedRemoteFridaVersionsUseCase = GetCachedRemoteFridaVersionsUseCase(versionRepository)
     val getInstalledFridaVersionsUseCase = GetInstalledFridaVersionsUseCase(versionRepository)
-    val downloadFridaVersionUseCase = DownloadFridaVersionUseCase(versionRepository)
     val observeDownloadTasksUseCase = ObserveDownloadTasksUseCase(downloadManager)
     val enqueueFridaDownloadUseCase = EnqueueFridaDownloadUseCase(downloadManager)
     val cancelFridaDownloadUseCase = CancelFridaDownloadUseCase(downloadManager)
@@ -141,7 +138,6 @@ class AppContainer(private val context: Context) {
     val stopFridaServerUseCase = StopFridaServerUseCase(runtimeRepository)
     val restartFridaServerUseCase = RestartFridaServerUseCase(runtimeRepository)
     val refreshRuntimeStatusUseCase = RefreshRuntimeStatusUseCase(runtimeRepository)
-    val recoverRuntimeStatusUseCase = RecoverRuntimeStatusUseCase(runtimeRepository)
     val setRuntimeMonitoringUseCase = SetRuntimeMonitoringUseCase(runtimeRepository)
     val observeRuntimeStatusUseCase = ObserveRuntimeStatusUseCase(runtimeRepository)
     val observeSettingsUseCase = ObserveSettingsUseCase(settingsRepository)

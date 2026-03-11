@@ -6,7 +6,6 @@ import com.yuhao7370.fridamanager.data.FridaVersionRepository
 import com.yuhao7370.fridamanager.model.AppResult
 import com.yuhao7370.fridamanager.model.InstallProgress
 import com.yuhao7370.fridamanager.model.InstalledFridaVersion
-import com.yuhao7370.fridamanager.model.RemoteFridaAsset
 import com.yuhao7370.fridamanager.model.RemoteFridaVersion
 import kotlinx.coroutines.flow.Flow
 
@@ -22,14 +21,6 @@ class GetCachedRemoteFridaVersionsUseCase(private val repository: FridaVersionRe
 
 class GetInstalledFridaVersionsUseCase(private val repository: FridaVersionRepository) {
     operator fun invoke(): Flow<List<InstalledFridaVersion>> = repository.observeInstalledVersions()
-}
-
-class DownloadFridaVersionUseCase(private val repository: FridaVersionRepository) {
-    suspend operator fun invoke(
-        version: String,
-        asset: RemoteFridaAsset,
-        onProgress: suspend (InstallProgress) -> Unit
-    ): AppResult<InstalledFridaVersion> = repository.installRemoteAsset(version, asset, onProgress)
 }
 
 class ImportFridaVersionUseCase(private val repository: FridaVersionRepository) {
