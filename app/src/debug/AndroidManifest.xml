@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <receiver
+            android:name=".app.DebugCommandReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.yuhao7370.fridamanager.DEBUG_START" />
+                <action android:name="com.yuhao7370.fridamanager.DEBUG_STOP" />
+                <action android:name="com.yuhao7370.fridamanager.DEBUG_RESTART" />
+                <action android:name="com.yuhao7370.fridamanager.DEBUG_STATUS" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
