@@ -20,8 +20,6 @@
 
     <string name="home_title">Frida Manager</string>
     <string name="home_top_subtitle">Switch Frida versions anytime</string>
-    <string name="home_runtime_title">Runtime</string>
-    <string name="home_runtime_subtitle">Current process and control state</string>
     <string name="home_runtime_overview_title">Current runtime</string>
     <string name="home_status">Status</string>
     <string name="home_active_version">Active version</string>
@@ -39,22 +37,14 @@
     <string name="runtime_status_stopping">Stopping</string>
     <string name="runtime_status_stopped">Stopped</string>
     <string name="runtime_status_error">Error</string>
-    <string name="home_actions">Actions</string>
     <string name="home_start">Start</string>
     <string name="home_stop">Stop</string>
     <string name="home_restart">Restart</string>
-    <string name="home_quick_actions">Quick actions</string>
-    <string name="home_manage_versions">Manage versions</string>
-    <string name="home_view_logs">View logs</string>
 
     <string name="versions_title">Versions</string>
     <string name="versions_top_subtitle">Device ABI: %1$s</string>
-    <string name="versions_import_refresh_title">Import or refresh</string>
-    <string name="versions_abi_format">ABI: %1$s</string>
     <string name="versions_import_file">Import file</string>
     <string name="versions_refresh_remote">Refresh</string>
-    <string name="versions_quick_download_title">Quick download</string>
-    <string name="versions_quick_download_subtitle">Enter an exact version (for example 17.8.0) and download directly.</string>
     <string name="versions_quick_version_label">Version</string>
     <string name="versions_quick_version_placeholder">17.8.0 or v17.8.0</string>
     <string name="versions_quick_download_button">Get</string>
@@ -93,9 +83,7 @@
     <string name="versions_download_speed_format">Speed: %1$s/s</string>
     <string name="versions_major_group_format">v%1$s.x</string>
     <string name="versions_count_format">%1$d versions</string>
-    <string name="versions_tap_expand">Tap to expand</string>
     <string name="versions_remote_timeout_hint">Remote request timed out. Check network or set mirror API URL in Settings.</string>
-    <string name="versions_remote_cached_hint">Remote request failed. Showing locally cached releases.</string>
     <string name="versions_delete_confirm_title">Delete %1$s?</string>
     <string name="versions_delete_confirm_message">This removes the local managed binary for this version.</string>
     <string name="versions_status_broken">Broken</string>
@@ -103,7 +91,6 @@
     <string name="versions_status_installed">Installed</string>
     <string name="versions_status_incompatible">Incompatible</string>
     <string name="versions_status_available">Available</string>
-    <string name="versions_path">Path</string>
     <string name="versions_source">Source</string>
     <string name="versions_switch">Switch</string>
     <string name="versions_working">Working…</string>
@@ -146,7 +133,6 @@
     <string name="settings_log_retention">Log retention (KB)</string>
     <string name="settings_github_base_url">GitHub API base URL</string>
     <string name="settings_appearance">Appearance</string>
-    <string name="settings_appearance_subtitle">Theme and language</string>
     <string name="settings_theme_system">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
@@ -154,7 +140,6 @@
     <string name="settings_language_system">System</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_simplified_chinese">简体中文</string>
-    <string name="settings_root_diagnostics">Root diagnostics</string>
     <string name="settings_about">About</string>
     <string name="settings_about_subtitle">App information and project link</string>
     <string name="settings_package">Package</string>

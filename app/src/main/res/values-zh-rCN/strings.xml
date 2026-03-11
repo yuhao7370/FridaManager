@@ -20,8 +20,6 @@
 
     <string name="home_title">Frida 管理器</string>
     <string name="home_top_subtitle">随时切换 Frida 版本</string>
-    <string name="home_runtime_title">运行状态</string>
-    <string name="home_runtime_subtitle">当前进程与控制状态</string>
     <string name="home_runtime_overview_title">当前运行态</string>
     <string name="home_status">状态</string>
     <string name="home_active_version">当前版本</string>
@@ -39,22 +37,14 @@
     <string name="runtime_status_stopping">停止中</string>
     <string name="runtime_status_stopped">已停止</string>
     <string name="runtime_status_error">错误</string>
-    <string name="home_actions">操作</string>
     <string name="home_start">启动</string>
     <string name="home_stop">停止</string>
     <string name="home_restart">重启</string>
-    <string name="home_quick_actions">快捷入口</string>
-    <string name="home_manage_versions">管理版本</string>
-    <string name="home_view_logs">查看日志</string>
 
     <string name="versions_title">版本管理</string>
     <string name="versions_top_subtitle">设备 ABI：%1$s</string>
-    <string name="versions_import_refresh_title">导入或刷新</string>
-    <string name="versions_abi_format">ABI：%1$s</string>
     <string name="versions_import_file">导入文件</string>
     <string name="versions_refresh_remote">刷新远程</string>
-    <string name="versions_quick_download_title">快速下载</string>
-    <string name="versions_quick_download_subtitle">输入精确版本号（如 17.8.0）后可直接下载。</string>
     <string name="versions_quick_version_label">版本号</string>
     <string name="versions_quick_version_placeholder">17.8.0 或 v17.8.0</string>
     <string name="versions_quick_download_button">按版本下载</string>
@@ -93,9 +83,7 @@
     <string name="versions_download_speed_format">速度：%1$s/s</string>
     <string name="versions_major_group_format">v%1$s.x</string>
     <string name="versions_count_format">%1$d 个版本</string>
-    <string name="versions_tap_expand">点击展开</string>
     <string name="versions_remote_timeout_hint">远程请求超时，请检查网络或在设置中配置镜像 API 地址。</string>
-    <string name="versions_remote_cached_hint">远程请求失败，已显示本地缓存的版本列表。</string>
     <string name="versions_delete_confirm_title">删除 %1$s？</string>
     <string name="versions_delete_confirm_message">将删除该版本在本地管理目录中的二进制文件。</string>
     <string name="versions_status_broken">损坏</string>
@@ -103,7 +91,6 @@
     <string name="versions_status_installed">已安装</string>
     <string name="versions_status_incompatible">不兼容</string>
     <string name="versions_status_available">可用</string>
-    <string name="versions_path">路径</string>
     <string name="versions_source">来源</string>
     <string name="versions_switch">切换</string>
     <string name="versions_working">处理中…</string>
@@ -146,7 +133,6 @@
     <string name="settings_log_retention">日志保留（KB）</string>
     <string name="settings_github_base_url">GitHub API 基础地址</string>
     <string name="settings_appearance">外观</string>
-    <string name="settings_appearance_subtitle">主题与语言</string>
     <string name="settings_theme_system">跟随系统</string>
     <string name="settings_theme_light">浅色</string>
     <string name="settings_theme_dark">深色</string>
@@ -154,7 +140,6 @@
     <string name="settings_language_system">跟随系统</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_simplified_chinese">简体中文</string>
-    <string name="settings_root_diagnostics">Root 诊断</string>
     <string name="settings_about">关于</string>
     <string name="settings_about_subtitle">应用信息与项目链接</string>
     <string name="settings_package">包名</string>
