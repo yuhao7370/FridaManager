@@ -80,6 +80,14 @@
     <string name="versions_download_status_completed">已完成</string>
     <string name="versions_download_status_failed">失败</string>
     <string name="versions_download_status_canceled">已取消</string>
+    <string name="versions_download_detail_queued">等待开始</string>
+    <string name="versions_download_detail_starting">正在建立下载…</string>
+    <string name="versions_download_detail_downloading">正在下载资源包…</string>
+    <string name="versions_download_detail_decompressing">正在解压资源包…</string>
+    <string name="versions_download_detail_installing">正在安装二进制…</string>
+    <string name="versions_download_detail_completed">下载并安装完成</string>
+    <string name="versions_download_detail_failed">下载失败</string>
+    <string name="versions_download_detail_canceled">下载已取消</string>
     <string name="versions_download_speed_format">速度：%1$s/s</string>
     <string name="versions_major_group_format">v%1$s.x</string>
     <string name="versions_count_format">%1$d 个版本</string>

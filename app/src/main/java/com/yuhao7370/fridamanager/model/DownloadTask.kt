@@ -14,6 +14,7 @@ data class DownloadTask(
     val version: String,
     val assetName: String,
     val status: DownloadTaskStatus,
+    val phase: InstallPhase = InstallPhase.IDLE,
     val downloadedBytes: Long = 0L,
     val totalBytes: Long = 0L,
     val speedBytesPerSec: Long = 0L,

@@ -681,20 +681,24 @@ private fun DownloadTaskCard(
             modifier = Modifier.padding(top = spacing.xs)
         )
 
-        val speedText = if (task.speedBytesPerSec > 0L) {
-            stringResource(
-                R.string.versions_download_speed_format,
-                formatSize(task.speedBytesPerSec)
-            )
-        } else {
-            stringResource(R.string.common_na)
-        }
         Text(
-            text = speedText,
+            text = task.detailText(),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = spacing.xs)
         )
+
+        if (task.speedBytesPerSec > 0L) {
+            Text(
+                text = stringResource(
+                    R.string.versions_download_speed_format,
+                    formatSize(task.speedBytesPerSec)
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = spacing.xs)
+            )
+        }
 
         if (!task.message.isNullOrBlank()) {
             Text(
@@ -745,6 +749,29 @@ private fun DownloadTaskStatus.tone(): MiStatusTone {
         DownloadTaskStatus.COMPLETED -> MiStatusTone.SUCCESS
         DownloadTaskStatus.FAILED -> MiStatusTone.ERROR
         DownloadTaskStatus.CANCELED -> MiStatusTone.WARNING
+    }
+}
+
+@Composable
+private fun DownloadTask.detailText(): String {
+    return when (status) {
+        DownloadTaskStatus.QUEUED -> stringResource(R.string.versions_download_detail_queued)
+        DownloadTaskStatus.DOWNLOADING -> {
+            if (speedBytesPerSec > 0L || downloadedBytes > 0L) {
+                stringResource(R.string.versions_download_detail_downloading)
+            } else {
+                stringResource(R.string.versions_download_detail_starting)
+            }
+        }
+
+        DownloadTaskStatus.INSTALLING -> when (phase) {
+            InstallPhase.DECOMPRESSING -> stringResource(R.string.versions_download_detail_decompressing)
+            else -> stringResource(R.string.versions_download_detail_installing)
+        }
+
+        DownloadTaskStatus.COMPLETED -> stringResource(R.string.versions_download_detail_completed)
+        DownloadTaskStatus.CANCELED -> stringResource(R.string.versions_download_detail_canceled)
+        DownloadTaskStatus.FAILED -> message ?: stringResource(R.string.versions_download_detail_failed)
     }
 }
 

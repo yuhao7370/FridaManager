@@ -46,6 +46,8 @@ class FridaDownloadManager(
             version = version,
             assetName = asset.name,
             status = DownloadTaskStatus.QUEUED,
+            phase = InstallPhase.IDLE,
+            totalBytes = asset.sizeBytes.coerceAtLeast(0L),
             createdAtMs = now,
             updatedAtMs = now
         )
@@ -65,6 +67,7 @@ class FridaDownloadManager(
             if (current.isTerminal) current else {
                 current.copy(
                     status = DownloadTaskStatus.CANCELED,
+                    phase = InstallPhase.FAILED,
                     speedBytesPerSec = 0L,
                     message = null,
                     updatedAtMs = System.currentTimeMillis()
@@ -94,8 +97,8 @@ class FridaDownloadManager(
         val request = taskRequests[taskId] ?: return
         val job = appScope.launch(Dispatchers.IO) {
             logger.log("Download queued version=${request.version} asset=${request.asset.name}")
-            var lastSampleBytes = 0L
-            var lastSampleMs = System.currentTimeMillis()
+            var lastSpeedSampleBytes = 0L
+            var lastSpeedSampleMs = System.currentTimeMillis()
             var lastEmitMs = 0L
 
             val result = versionRepository.installRemoteAsset(
@@ -103,30 +106,43 @@ class FridaDownloadManager(
                 asset = request.asset
             ) { progress ->
                 val now = System.currentTimeMillis()
-                val deltaBytes = (progress.downloadedBytes - lastSampleBytes).coerceAtLeast(0L)
-                val deltaMs = (now - lastSampleMs).coerceAtLeast(1L)
+                val deltaBytes = (progress.downloadedBytes - lastSpeedSampleBytes).coerceAtLeast(0L)
+                val deltaMs = (now - lastSpeedSampleMs).coerceAtLeast(1L)
                 val speed = if (progress.phase == InstallPhase.DOWNLOADING) {
                     (deltaBytes * 1000L) / deltaMs
                 } else {
                     0L
                 }
+                val firstDownloadEmit = progress.phase == InstallPhase.DOWNLOADING &&
+                    progress.downloadedBytes > 0L &&
+                    lastEmitMs == 0L
                 val shouldEmit = now - lastEmitMs >= PROGRESS_EMIT_INTERVAL_MS ||
+                    firstDownloadEmit ||
                     progress.phase != InstallPhase.DOWNLOADING
                 if (shouldEmit) {
                     updateTask(taskId) { current ->
+                        val resolvedTotalBytes = maxOf(current.totalBytes, progress.totalBytes)
+                        val resolvedDownloadedBytes = when (progress.phase) {
+                            InstallPhase.DOWNLOADING -> progress.downloadedBytes
+                            InstallPhase.COMPLETED -> maxOf(current.downloadedBytes, resolvedTotalBytes)
+                            else -> current.downloadedBytes
+                        }
                         current.copy(
                             status = mapPhaseToStatus(progress.phase),
-                            downloadedBytes = progress.downloadedBytes,
-                            totalBytes = progress.totalBytes,
+                            phase = progress.phase,
+                            downloadedBytes = resolvedDownloadedBytes,
+                            totalBytes = resolvedTotalBytes,
                             speedBytesPerSec = speed.coerceAtLeast(0L),
-                            message = null,
+                            message = current.message,
                             updatedAtMs = now
                         )
                     }
                     lastEmitMs = now
+                    if (progress.phase == InstallPhase.DOWNLOADING) {
+                        lastSpeedSampleBytes = progress.downloadedBytes
+                        lastSpeedSampleMs = now
+                    }
                 }
-                lastSampleBytes = progress.downloadedBytes
-                lastSampleMs = now
             }
 
             when (result) {
@@ -134,6 +150,8 @@ class FridaDownloadManager(
                     updateTask(taskId) { current ->
                         current.copy(
                             status = DownloadTaskStatus.COMPLETED,
+                            phase = InstallPhase.COMPLETED,
+                            downloadedBytes = maxOf(current.downloadedBytes, current.totalBytes),
                             speedBytesPerSec = 0L,
                             message = null,
                             updatedAtMs = System.currentTimeMillis()
@@ -146,6 +164,7 @@ class FridaDownloadManager(
                     updateTask(taskId) { current ->
                         current.copy(
                             status = DownloadTaskStatus.FAILED,
+                            phase = InstallPhase.FAILED,
                             speedBytesPerSec = 0L,
                             message = result.error.message ?: result.error.type.name,
                             updatedAtMs = System.currentTimeMillis()
@@ -164,6 +183,7 @@ class FridaDownloadManager(
                     if (current.isTerminal) current else {
                         current.copy(
                             status = DownloadTaskStatus.CANCELED,
+                            phase = InstallPhase.FAILED,
                             speedBytesPerSec = 0L,
                             message = null,
                             updatedAtMs = System.currentTimeMillis()
@@ -207,6 +227,6 @@ class FridaDownloadManager(
 
     private companion object {
         const val MAX_TASKS = 60
-        const val PROGRESS_EMIT_INTERVAL_MS = 220L
+        const val PROGRESS_EMIT_INTERVAL_MS = 90L
     }
 }

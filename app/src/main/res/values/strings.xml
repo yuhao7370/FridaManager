@@ -80,6 +80,14 @@
     <string name="versions_download_status_completed">Completed</string>
     <string name="versions_download_status_failed">Failed</string>
     <string name="versions_download_status_canceled">Canceled</string>
+    <string name="versions_download_detail_queued">Waiting to start</string>
+    <string name="versions_download_detail_starting">Starting transfer…</string>
+    <string name="versions_download_detail_downloading">Downloading package…</string>
+    <string name="versions_download_detail_decompressing">Decompressing package…</string>
+    <string name="versions_download_detail_installing">Installing binary…</string>
+    <string name="versions_download_detail_completed">Download and install completed</string>
+    <string name="versions_download_detail_failed">Download failed</string>
+    <string name="versions_download_detail_canceled">Download canceled</string>
     <string name="versions_download_speed_format">Speed: %1$s/s</string>
     <string name="versions_major_group_format">v%1$s.x</string>
     <string name="versions_count_format">%1$d versions</string>
