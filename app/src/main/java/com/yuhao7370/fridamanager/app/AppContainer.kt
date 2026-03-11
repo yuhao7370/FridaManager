@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit
 class AppContainer(private val context: Context) {
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    val fileLayout = FridaFileLayout(context)
+    private val fileLayout = FridaFileLayout(context)
     private val stateStore = RuntimeStateStore(fileLayout)
     private val logger = ControllerLogger(fileLayout)
     private val remoteReleaseCacheStore = RemoteReleaseCacheStore(fileLayout.remoteReleasesCacheFile)
@@ -93,7 +93,7 @@ class AppContainer(private val context: Context) {
     private val gitHubReleaseApi = GitHubReleaseApi(httpClient)
     private val settingsStore = AppSettingsStore(context)
 
-    val settingsRepository = SettingsRepository(settingsStore)
+    private val settingsRepository = SettingsRepository(settingsStore)
     private val abiRepository = AbiRepository(rootShellManager)
     private val logsRepository = LogsRepository(fileLayout)
     private val versionRepository = FridaVersionRepository(
