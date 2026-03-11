@@ -13,12 +13,14 @@ object FridaVersionSafetyPolicy {
             ?: return FridaVersionSafetyDecision(allowed = true)
 
         // Practical guardrail:
-        // On this Android 16 / HyperOS 3 device family, Frida 16.x reproduced a system_server crash
-        // during runtime/stop. Blocking older major versions is safer than allowing device reboots.
+        // Android 16 has upstream stability reports around running frida-server
+        // (see frida/frida#3471 and frida/frida#3620). Combined with local reproduction
+        // of severe instability on Frida 16.x, this app conservatively blocks Frida 16.x
+        // on Android 16+. Frida 17+ is only a safer starting point, not a hard guarantee.
         if (sdkInt >= 36 && major < 17) {
             return FridaVersionSafetyDecision(
                 allowed = false,
-                message = "Frida $version is blocked on Android 16+ because this device reproduced system_server crashes with Frida 16.x. Use Frida 17 or newer."
+                message = "Frida $version is blocked on Android 16+ due to reported Android 16 stability issues. Start from Frida 17 or newer, then verify stability on your device."
             )
         }
 
