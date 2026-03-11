@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.topjohnwu.superuser.ipc.RootService
 import com.yuhao7370.fridamanager.root.ipc.IFridaSupervisorService
 import kotlinx.coroutines.CompletableDeferred
@@ -88,7 +89,7 @@ class FridaSupervisorClient(context: Context) {
             connectionDeferred = deferred
             Log.i(TAG, "Binding root supervisor service")
             withContext(Dispatchers.Main.immediate) {
-                RootService.bind(serviceIntent, appContext.mainExecutor, connection)
+                RootService.bind(serviceIntent, ContextCompat.getMainExecutor(appContext), connection)
             }
             val connected = withTimeout(BIND_TIMEOUT_MS) { deferred.await() }
             service = connected

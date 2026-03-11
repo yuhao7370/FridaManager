@@ -5,6 +5,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+fun Project.secret(name: String): String? {
+    return providers.gradleProperty(name).orNull
+        ?: providers.environmentVariable(name).orNull
+}
+
 android {
     namespace = "com.yuhao7370.fridamanager"
     compileSdk = 35
@@ -22,6 +27,26 @@ android {
         }
     }
 
+    signingConfigs {
+        val keystorePath = project.secret("ANDROID_KEYSTORE_PATH")
+        val keystorePassword = project.secret("ANDROID_KEYSTORE_PASSWORD")
+        val keyAlias = project.secret("ANDROID_KEY_ALIAS")
+        val keyPassword = project.secret("ANDROID_KEY_PASSWORD")
+
+        if (!keystorePath.isNullOrBlank() &&
+            !keystorePassword.isNullOrBlank() &&
+            !keyAlias.isNullOrBlank() &&
+            !keyPassword.isNullOrBlank()
+        ) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -29,6 +54,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

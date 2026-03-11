@@ -10,4 +10,5 @@
 /captures
 /build
 /app/build
+/.secrets
 .DS_Store
